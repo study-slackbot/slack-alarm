@@ -16,18 +16,37 @@ from funcy import cached_property
 app = Flask(__name__)
 
 
-@app.route('/', methods=['GET', 'POST'])
-def hello() -> str:
-    return "Hello Flask!"
+@app.route('/covid/interactivity', methods=['POST'])
+def interaction() -> str:
+    req = request.form.to_dict()
+    payload = json.loads(req['payload'])
+    action_type = payload['type'] # block_actions, view_submission, ...
+    trigger_id = payload['trigger_id']
+    action_value = payload['actions'][0]['value'] #get_covid_data, ...
+
+    if action_value == 'get_covid_data': # button을 눌렀을 때
+        for id, dict in payload['state']['values'].items():
+            if dict.get('get-start-date'):
+                start_date = dict['get-start-date']['selected_date']
+            elif dict.get('get-end-date'):
+                end_date = dict['get-end-date']['selected_date']
+
+    result = {
+        'start_date': start_date,
+        'end_date': end_date
+    }
+    print(result)
+    return 'ok'
 
 
-# class TestView(FlaskView):
 @app.route('/covid', methods=['POST'])
 def test():
     req = request.form.to_dict()
+    print(req)
     request_text = req['text']
+    body = generating_menu()
     result = {
-        "response_type": "in_channel",
+        "response_type": "ephemeral",
         "text": "thread_test",
         "attachments": [
             {
@@ -35,7 +54,7 @@ def test():
             }
         ]
     }
-    return result, 200
+    return body, 200
 
 
 if __name__ == "__main__":

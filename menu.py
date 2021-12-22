@@ -3,7 +3,7 @@ def generating_menu():
         "type": "button",
         "text": {
             "type": "plain_text",
-            "text": "test",
+            "text": "button1",
             "emoji": True
         },
         "value": "get_covid_data"
